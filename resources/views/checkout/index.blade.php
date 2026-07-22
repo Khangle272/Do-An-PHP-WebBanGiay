@@ -80,7 +80,7 @@
 
                 @foreach($cartItems as $item)
                     <div style="display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f5f5f5;">
-                        <img src="{{ $item->product->thumbnail }}" alt=""
+                        <img src="{{ $item->product->thumbnail_url }}" alt=""
                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
                         <div style="flex: 1;">
                             <div style="font-size: 13px; font-weight: 500;">{{ $item->product->name }}</div>
@@ -90,7 +90,8 @@
                                 × {{ $item->quantity }}
                             </div>
                             <div style="font-size: 13px; font-weight: 600; color: #e94560;">
-                                {{ number_format($item->subtotal) }}₫</div>
+                                {{ number_format($item->subtotal) }}₫
+                            </div>
                         </div>
                     </div>
                 @endforeach

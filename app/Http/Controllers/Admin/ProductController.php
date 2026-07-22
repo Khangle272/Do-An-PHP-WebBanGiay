@@ -10,6 +10,7 @@ use App\Models\ProductColor;
 use App\Models\ProductImage;
 use App\Models\ProductSize;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -47,7 +48,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
-            'thumbnail' => 'nullable|string|max:500',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'boolean',
             'featured' => 'boolean',
             'sizes' => 'nullable|array',
@@ -58,12 +59,18 @@ class ProductController extends Controller
             'colors.*.code' => 'nullable|string',
             'colors.*.stock' => 'required|integer|min:0',
             'images' => 'nullable|array',
-            'images.*' => 'nullable|string|max:500',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $data['slug'] = Str::slug($data['name']) . '-' . time();
         $data['status'] = $request->boolean('status', true);
         $data['featured'] = $request->boolean('featured', false);
+
+        // Xử lý upload thumbnail
+        $data['thumbnail'] = null;
+        if ($request->hasFile('thumbnail')) {
+            $data['thumbnail'] = $request->file('thumbnail')->store('products', 'public');
+        }
 
         $product = Product::create($data);
 
@@ -90,13 +97,14 @@ class ProductController extends Controller
             }
         }
 
-        // Thêm images
-        if ($request->has('images')) {
-            foreach ($request->images as $index => $imageUrl) {
-                if (!empty($imageUrl)) {
+        // Thêm images (upload file)
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $imageFile) {
+                if ($imageFile && $imageFile->isValid()) {
+                    $path = $imageFile->store('products', 'public');
                     ProductImage::create([
                         'product_id' => $product->id,
-                        'image' => $imageUrl,
+                        'image' => $path,
                         'sort_order' => $index + 1,
                     ]);
                 }
@@ -125,13 +133,24 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
-            'thumbnail' => 'nullable|string|max:500',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'boolean',
             'featured' => 'boolean',
         ]);
 
         $data['status'] = $request->boolean('status', true);
         $data['featured'] = $request->boolean('featured', false);
+
+        // Xử lý upload thumbnail
+        if ($request->hasFile('thumbnail')) {
+            // Xóa ảnh cũ nếu có
+            if ($product->thumbnail && !filter_var($product->thumbnail, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete($product->thumbnail);
+            }
+            $data['thumbnail'] = $request->file('thumbnail')->store('products', 'public');
+        } else {
+            unset($data['thumbnail']);
+        }
 
         $product->update($data);
 
@@ -141,6 +160,19 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
+
+        // Xóa file ảnh thumbnail
+        if ($product->thumbnail && !filter_var($product->thumbnail, FILTER_VALIDATE_URL)) {
+            Storage::disk('public')->delete($product->thumbnail);
+        }
+
+        // Xóa file ảnh gallery
+        foreach ($product->images as $image) {
+            if ($image->image && !filter_var($image->image, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete($image->image);
+            }
+        }
+
         $product->sizes()->delete();
         $product->colors()->delete();
         $product->images()->delete();

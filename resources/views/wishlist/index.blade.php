@@ -20,7 +20,7 @@
                         @endif
                         <a href="/san-pham/{{ $item->product->slug }}">
                             <div class="image-wrap">
-                                <img src="{{ $item->product->thumbnail }}" alt="{{ $item->product->name }}" loading="lazy">
+                                <img src="{{ $item->product->thumbnail_url }}" alt="{{ $item->product->name }}" loading="lazy">
                             </div>
                         </a>
                         <div class="info">

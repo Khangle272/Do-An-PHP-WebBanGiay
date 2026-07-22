@@ -111,4 +111,15 @@ class Product extends Model
     {
         return $query->where('featured', true);
     }
+
+    public function getThumbnailUrlAttribute()
+    {
+        if (!$this->thumbnail) {
+            return 'https://via.placeholder.com/400x400?text=No+Image';
+        }
+        if (filter_var($this->thumbnail, FILTER_VALIDATE_URL)) {
+            return $this->thumbnail;
+        }
+        return asset('storage/' . $this->thumbnail);
+    }
 }

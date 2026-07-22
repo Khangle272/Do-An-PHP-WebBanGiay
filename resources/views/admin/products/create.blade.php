@@ -9,7 +9,7 @@
     </div>
 
     <div class="card">
-        <form method="POST" action="/admin/san-pham">
+        <form method="POST" action="/admin/san-pham" enctype="multipart/form-data">
             @csrf
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -57,9 +57,10 @@
             </div>
 
             <div class="form-group">
-                <label>URL Ảnh đại diện</label>
-                <input type="text" name="thumbnail" class="form-control" value="{{ old('thumbnail') }}"
-                    placeholder="https://...">
+                <label>Ảnh đại diện</label>
+                <input type="file" name="thumbnail" class="form-control" accept="image/*">
+                <small style="color: #999;">Chọn file ảnh (JPEG, PNG, JPG, GIF, WebP, tối đa 2MB).</small>
+                @error('thumbnail') <small style="color: red;">{{ $message }}</small> @enderror
             </div>
 
             <div style="display: flex; gap: 20px; margin-bottom: 16px;">
@@ -100,13 +101,15 @@
             <button type="button" class="btn btn-sm btn-secondary" onclick="addColor()">+ Thêm màu</button>
 
             <hr style="margin: 20px 0;">
-
-            <h4 style="margin-bottom: 16px;">🖼️ Hình ảnh (URL)</h4>
+            gallery (upload nhiều file)</h4>
             <div id="images-wrapper">
-                <div class="image-row" style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <input type="text" name="images[]" class="form-control" placeholder="URL hình ảnh..." style="flex: 1;">
+                <div class="image-row" style="margin-bottom: 8px;">
+                    <input type="file" name="images[]" class="form-control" accept="image/*" multiple style="padding: 8px;">
                 </div>
             </div>
+            <small style="color: #999;">Có thể chọn nhiều file cùng lúc (JPEG, PNG, JPG, GIF, WebP, tối đa 2MB mỗi
+                file).</small>
+            @error('images.*') <small style="color: red;">{{ $message }}</small> @enderror
             <button type="button" class="btn btn-sm btn-secondary" onclick="addImage()">+ Thêm ảnh</button>
 
             <div style="margin-top: 24px;">
@@ -116,30 +119,23 @@
         </form>
     </div>
 
-    <script>
-        let sizeIndex = 1, colorIndex = 1, imageIndex = 1;
+    <script>;
         function addSize() {
             const html = `<div class="size-row" style="display: flex; gap: 10px; margin-bottom: 8px;">
-                <input type="text" name="sizes[${sizeIndex}][size]" class="form-control" placeholder="Size" style="max-width: 150px;" required>
-                <input type="number" name="sizes[${sizeIndex}][stock]" class="form-control" placeholder="Số lượng" style="max-width: 150px;" min="0" required>
-            </div>`;
+                    <input type="text" name="sizes[${sizeIndex}][size]" class="form-control" placeholder="Size" style="max-width: 150px;" required>
+                    <input type="number" name="sizes[${sizeIndex}][stock]" class="form-control" placeholder="Số lượng" style="max-width: 150px;" min="0" required>
+                </div>`;
             document.getElementById('sizes-wrapper').insertAdjacentHTML('beforeend', html);
             sizeIndex++;
         }
         function addColor() {
             const html = `<div class="color-row" style="display: flex; gap: 10px; margin-bottom: 8px;">
-                <input type="text" name="colors[${colorIndex}][name]" class="form-control" placeholder="Tên màu" style="max-width: 150px;" required>
-                <input type="text" name="colors[${colorIndex}][code]" class="form-control" placeholder="Mã màu" style="max-width: 150px;">
-                <input type="number" name="colors[${colorIndex}][stock]" class="form-control" placeholder="Số lượng" style="max-width: 150px;" min="0" required>
-            </div>`;
+                    <input type="text" name="colors[${colorIndex}][name]" class="form-control" placeholder="Tên màu" style="max-width: 150px;" required>
+                    <input type="text" name="colors[${colorIndex}][code]" class="form-control" placeholder="Mã màu" style="max-width: 150px;">
+                    <input type="number" name="colors[${colorIndex}][stock]" class="form-control" placeholder="Số lượng" style="max-width: 150px;" min="0" required>
+                </div>`;
             document.getElementById('colors-wrapper').insertAdjacentHTML('beforeend', html);
-            colorIndex++;
-        }
-        function addImage() {
-            const html = `<div class="image-row" style="display: flex; gap: 10px; margin-bottom: 8px;">
-                <input type="text" name="images[]" class="form-control" placeholder="URL hình ảnh..." style="flex: 1;">
-            </div>`;
-            document.getElementById('images-wrapper').insertAdjacentHTML('beforeend', html);
+            colorent.getElementById('images-wrapper').insertAdjacentHTML('beforeend', html);
             imageIndex++;
         }
     </script>

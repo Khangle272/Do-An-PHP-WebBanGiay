@@ -46,7 +46,7 @@
                         <span class="badge featured" style="left: auto; right: 12px;">Nổi bật</span>
                         <a href="/san-pham/{{ $product->slug }}">
                             <div class="image-wrap">
-                                <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" loading="lazy">
+                                <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}" loading="lazy">
                             </div>
                         </a>
                         <div class="info">
@@ -81,7 +81,7 @@
                         @endif
                         <a href="/san-pham/{{ $product->slug }}">
                             <div class="image-wrap">
-                                <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" loading="lazy">
+                                <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}" loading="lazy">
                             </div>
                         </a>
                         <div class="info">

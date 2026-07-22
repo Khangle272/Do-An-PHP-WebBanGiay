@@ -9,7 +9,7 @@
     </div>
 
     <div class="card">
-        <form method="POST" action="/admin/san-pham/{{ $product->id }}/sua">
+        <form method="POST" action="/admin/san-pham/{{ $product->id }}/sua" enctype="multipart/form-data">
             @csrf
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -23,7 +23,8 @@
                         <select name="category_id" class="form-control" required>
                             @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}" {{ $product->category_id == $cat->id ? 'selected' : '' }}>
-                                    {{ $cat->name }}</option>
+                                    {{ $cat->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -32,7 +33,8 @@
                         <select name="brand_id" class="form-control" required>
                             @foreach($brands as $brand)
                                 <option value="{{ $brand->id }}" {{ $product->brand_id == $brand->id ? 'selected' : '' }}>
-                                    {{ $brand->name }}</option>
+                                    {{ $brand->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -59,9 +61,17 @@
             </div>
 
             <div class="form-group">
-                <label>URL Ảnh đại diện</label>
-                <input type="text" name="thumbnail" class="form-control"
-                    value="{{ old('thumbnail', $product->thumbnail) }}">
+                <label>Ảnh đại diện</label>
+                @if($product->thumbnail_url)
+                    <div style="margin-bottom: 8px;">
+                        <img src="{{ $product->thumbnail_url }}" alt="Current thumbnail"
+                            style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    </div>
+                @endif
+                <input type="file" name="thumbnail" class="form-control" accept="image/*">
+                <small style="color: #999;">Chọn file ảnh mới nếu muốn thay đổi (JPEG, PNG, JPG, GIF, WebP, tối đa
+                    2MB).</small>
+                @error('thumbnail') <small style="color: red;">{{ $message }}</small> @enderror
             </div>
 
             <div style="display: flex; gap: 20px; margin-bottom: 16px;">

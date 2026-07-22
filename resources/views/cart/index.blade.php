@@ -37,7 +37,7 @@
                             @foreach($cartItems as $item)
                                 <tr>
                                     <td>
-                                        <img src="{{ $item->product->thumbnail }}" alt=""
+                                        <img src="{{ $item->product->thumbnail_url }}" alt=""
                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
                                     </td>
                                     <td>

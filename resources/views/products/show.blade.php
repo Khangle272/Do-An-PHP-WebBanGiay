@@ -15,14 +15,15 @@
             <!-- Gallery -->
             <div>
                 <div class="gallery-main">
-                    <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" id="main-image">
+                    <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}" id="main-image">
                 </div>
                 @if($product->images->count() > 0)
                     <div class="gallery-thumbs">
-                        <img src="{{ $product->thumbnail }}" class="active" data-src="{{ $product->thumbnail }}"
+                        <img src="{{ $product->thumbnail_url }}" class="active" data-src="{{ $product->thumbnail_url }}"
                             alt="Thumbnail">
                         @foreach($product->images as $image)
-                            <img src="{{ $image->image }}" data-src="{{ $image->image }}" alt="Product image" loading="lazy">
+                            <img src="{{ $image->image_url }}" data-src="{{ $image->image_url }}" alt="Product image"
+                                loading="lazy">
                         @endforeach
                     </div>
                 @endif
@@ -195,7 +196,8 @@
                                 <span class="badge">-{{ $rp->sale_percentage }}%</span>
                             @endif
                             <a href="/san-pham/{{ $rp->slug }}">
-                                <div class="image-wrap"><img src="{{ $rp->thumbnail }}" alt="{{ $rp->name }}" loading="lazy"></div>
+                                <div class="image-wrap"><img src="{{ $rp->thumbnail_url }}" alt="{{ $rp->name }}" loading="lazy">
+                                </div>
                             </a>
                             <div class="info">
                                 <div class="brand-name">{{ $rp->brand->name ?? '' }}</div>
@@ -249,13 +251,13 @@
                 alert('Vui lòng đăng nhập để thêm vào giỏ hàng!');
                 window.location.href = '/dang-nhap';
             @endif
-        });
+            });
 
         // Wishlist toggle
         document.querySelectorAll('.wishlist-btn').forEach(btn => {
             btn.addEventListener('click', function () {
                 @auth
-                        const productId = this.dataset.productId;
+                                const productId = this.dataset.productId;
                     fetch('/yeu-thich/toggle/' + productId, {
                         method: 'POST',
                         headers: {
@@ -268,7 +270,7 @@
                 @else
                     window.location.href = '/dang-nhap';
                 @endauth
-            });
+                });
         });
     </script>
 @endsection
