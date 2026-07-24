@@ -126,9 +126,7 @@
                         @endforeach
                     </div>
 
-                    <div class="pagination">
-                        {{ $products->links() }}
-                    </div>
+                    {{ $products->links('partials.pagination') }}
                 @else
                     <div style="text-align: center; padding: 60px 20px; background: #fff; border-radius: 12px;">
                         <div style="font-size: 64px; margin-bottom: 16px;">😕</div>
