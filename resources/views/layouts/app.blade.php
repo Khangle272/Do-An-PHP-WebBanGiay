@@ -69,14 +69,18 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: nowrap;
             height: 70px;
+            gap: 18px;
         }
 
         .logo {
+            flex: 0 0 auto;
             font-size: 24px;
             font-weight: 800;
             text-decoration: none;
             color: #1a1a2e;
+            white-space: nowrap;
         }
 
         .logo span {
@@ -85,16 +89,24 @@
 
         .nav-menu {
             display: flex;
+            align-items: center;
+            flex: 1 1 auto;
+            min-width: 0;
             list-style: none;
             gap: 8px;
+            flex-wrap: nowrap;
+            overflow: hidden;
         }
 
         .nav-menu a {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
             text-decoration: none;
             color: #333;
             font-size: 14px;
             font-weight: 500;
-            padding: 8px 16px;
+            padding: 8px 12px;
             border-radius: 6px;
             transition: all 0.2s;
         }
@@ -108,10 +120,20 @@
         .header-actions {
             display: flex;
             align-items: center;
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
             gap: 12px;
+            min-width: 0;
+        }
+
+        .search-box {
+            flex: 0 1 185px;
+            min-width: 150px;
+            max-width: 185px;
         }
 
         .header-actions a {
+            white-space: nowrap;
             text-decoration: none;
             color: #333;
             position: relative;
@@ -194,7 +216,8 @@
             background: none;
             outline: none;
             padding: 10px 0;
-            width: 200px;
+            width: 100%;
+            min-width: 0;
             font-size: 14px;
             font-family: inherit;
         }
@@ -696,6 +719,12 @@
             .product-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 16px;
+            }
+
+            .main-header .container {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 12px 0;
             }
 
             .footer .container {
