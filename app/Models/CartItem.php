@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class CartItem extends Model
+{
+    protected $fillable = ['user_id', 'product_id', 'product_size_id', 'product_color_id', 'quantity'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function size()
+    {
+        return $this->belongsTo(ProductSize::class, 'product_size_id');
+    }
+
+    public function color()
+    {
+        return $this->belongsTo(ProductColor::class, 'product_color_id');
+    }
+
+    public function getSubtotalAttribute()
+    {
+        return $this->product->final_price * $this->quantity;
+    }
+}

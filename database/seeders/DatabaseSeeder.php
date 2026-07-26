@@ -10,16 +10,32 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Tạo tài khoản Admin
+        User::create([
+            'name' => 'Quản Trị Viên',
+            'email' => 'admin@webanhang.com',
+            'phone' => '0987654321',
+            'address' => 'Hà Nội, Việt Nam',
+            'password' => bcrypt('12345678'),
+            'is_admin' => true,
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Tạo tài khoản User mẫu
+        User::create([
+            'name' => 'Nguyễn Văn A',
+            'email' => 'user@webanhang.com',
+            'phone' => '0912345678',
+            'address' => 'Hồ Chí Minh, Việt Nam',
+            'password' => bcrypt('12345678'),
+            'is_admin' => false,
+        ]);
+
+        $this->call([
+            CategorySeeder::class,
+            BrandSeeder::class,
+            ProductSeeder::class,
         ]);
     }
 }
