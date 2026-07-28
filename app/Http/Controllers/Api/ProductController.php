@@ -12,6 +12,10 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    /**
+     * GET /api/products
+     * Query param hỗ trợ: category, brand, min_price, max_price, size, search, sort, page
+     */
     public function index(Request $request)
     {
         $query = Product::active()->with(['category', 'brand']);
@@ -30,6 +34,26 @@ class ProductController extends Controller
             }
         }
 
+        if ($request->filled('min_price')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('price', '>=', $request->min_price)
+                    ->orWhere('sale_price', '>=', $request->min_price);
+            });
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('price', '<=', $request->max_price)
+                    ->orWhere('sale_price', '<=', $request->max_price);
+            });
+        }
+
+        if ($request->filled('size')) {
+            $query->whereHas('sizes', function ($q) use ($request) {
+                $q->where('size', $request->size);
+            });
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -45,6 +69,9 @@ class ProductController extends Controller
             case 'price_desc':
                 $query->orderBy('price', 'desc');
                 break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
             default:
                 $query->latest();
                 break;
@@ -55,6 +82,9 @@ class ProductController extends Controller
         return ProductResource::collection($products);
     }
 
+    /**
+     * GET /api/products/{slug}
+     */
     public function show($slug)
     {
         $product = Product::active()
