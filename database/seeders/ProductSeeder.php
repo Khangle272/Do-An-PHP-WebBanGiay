@@ -9,6 +9,7 @@ use App\Models\ProductColor;
 use App\Models\ProductImage;
 use App\Models\ProductSize;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
@@ -212,6 +213,7 @@ class ProductSeeder extends Seeder
         foreach ($products as $data) {
             $category = $categories->firstWhere('name', $data['category']);
             $brand = $brands->firstWhere('name', $data['brand']);
+            $thumbnail = $this->findImage($data['name']);
 
             $product = Product::create([
                 'category_id' => $category->id,
@@ -221,16 +223,16 @@ class ProductSeeder extends Seeder
                 'description' => $data['description'],
                 'price' => $data['price'],
                 'sale_price' => $data['sale_price'],
-                'thumbnail' => 'https://picsum.photos/seed/' . Str::slug($data['name']) . '/400/400',
+                'thumbnail' => $thumbnail,
                 'status' => true,
                 'featured' => $data['featured'],
             ]);
 
-            // Thêm 3-5 ảnh cho sản phẩm
+            // Ảnh gallery: dùng lại đúng ảnh sản phẩm đó (đủ cho demo)
             for ($i = 1; $i <= 4; $i++) {
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image' => 'https://picsum.photos/seed/' . Str::slug($data['name']) . "-$i/400/400",
+                    'image' => $thumbnail,
                     'sort_order' => $i,
                 ]);
             }
@@ -255,5 +257,24 @@ class ProductSeeder extends Seeder
                 ]);
             }
         }
+    }
+
+    /**
+     * Tìm file ảnh trong storage/app/public/products theo tên sản phẩm.
+     * Thử lần lượt các đuôi file, nếu không có thì dùng default.jpg.
+     */
+    private function findImage(string $productName): string
+    {
+        $slug = Str::slug($productName);
+        $extensions = ['jpg', 'jpeg', 'png', 'webp'];
+
+        foreach ($extensions as $ext) {
+            $path = "products/{$slug}.{$ext}";
+            if (Storage::disk('public')->exists($path)) {
+                return $path;
+            }
+        }
+
+        return 'products/default.jpg';
     }
 }
