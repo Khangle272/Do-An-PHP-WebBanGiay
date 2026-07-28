@@ -9,6 +9,7 @@ use App\Models\ProductColor;
 use App\Models\ProductImage;
 use App\Models\ProductSize;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
@@ -212,6 +213,7 @@ class ProductSeeder extends Seeder
         foreach ($products as $data) {
             $category = $categories->firstWhere('name', $data['category']);
             $brand = $brands->firstWhere('name', $data['brand']);
+            $thumbnail = $this->findImage($data['name']);
 
             $product = Product::create([
                 'category_id' => $category->id,
@@ -221,7 +223,7 @@ class ProductSeeder extends Seeder
                 'description' => $data['description'],
                 'price' => $data['price'],
                 'sale_price' => $data['sale_price'],
-                'thumbnail' => 'https://picsum.photos/seed/' . Str::slug($data['name']) . '/400/400',
+                'thumbnail' => $thumbnail,
                 'status' => true,
                 'featured' => $data['featured'],
             ]);
@@ -255,5 +257,19 @@ class ProductSeeder extends Seeder
                 ]);
             }
         }
+    }
+    private function findImage(string $productName): string
+    {
+        $slug = Str::slug($productName);
+        $extensions = ['jpg', 'jpeg', 'png', 'webp'];
+
+        foreach ($extensions as $ext) {
+            $path = "products/{$slug}.{$ext}";
+            if (Storage::disk('public')->exists($path)) {
+                return $path;
+            }
+        }
+
+        return 'products/default.jpg';
     }
 }
