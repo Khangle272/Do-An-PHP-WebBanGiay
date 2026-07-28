@@ -1,0 +1,27 @@
+@extends('admin.layouts.admin')
+
+@section('title', 'Thêm thương hiệu')
+
+@section('content')
+    <div class="page-header">
+        <h2>➕ Thêm thương hiệu</h2>
+        <a href="/admin/thuong-hieu" class="btn btn-secondary">← Quay lại</a>
+    </div>
+
+    <div class="card" style="max-width: 600px;">
+        <form method="POST" action="/admin/thuong-hieu">
+            @csrf
+            <div class="form-group">
+                <label>Tên thương hiệu *</label>
+                <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+            </div>
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" name="status" value="1" checked> Hiển thị
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a href="/admin/thuong-hieu" class="btn btn-secondary">Hủy</a>
+        </form>
+    </div>
+@endsection
