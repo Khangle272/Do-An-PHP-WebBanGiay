@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductColor;
 use App\Models\ProductImage;
 use App\Models\ProductSize;
+use App\Models\ProductVariant;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -228,6 +229,9 @@ class ProductSeeder extends Seeder
                 'featured' => $data['featured'],
             ]);
 
+            $createdSizes = [];
+            $createdColors = [];
+
             // Thêm 3-5 ảnh cho sản phẩm
             for ($i = 1; $i <= 4; $i++) {
                 ProductImage::create([
@@ -239,7 +243,7 @@ class ProductSeeder extends Seeder
 
             // Thêm sizes
             foreach ($sizes as $size) {
-                ProductSize::create([
+                $createdSizes[] = ProductSize::create([
                     'product_id' => $product->id,
                     'size' => $size,
                     'stock' => rand(5, 30),
@@ -249,12 +253,25 @@ class ProductSeeder extends Seeder
             // Thêm màu sắc
             $colorCount = rand(2, 4);
             for ($i = 0; $i < $colorCount; $i++) {
-                ProductColor::create([
+                $createdColors[] = ProductColor::create([
                     'product_id' => $product->id,
                     'color_name' => $colors[$i]['name'],
                     'color_code' => $colors[$i]['code'],
                     'stock' => rand(5, 25),
                 ]);
+            }
+
+            // Tạo variants để hệ thống có tồn kho thực tế khi thêm vào giỏ hàng
+            foreach ($createdSizes as $size) {
+                foreach ($createdColors as $color) {
+                    ProductVariant::create([
+                        'product_id' => $product->id,
+                        'size' => $size->size,
+                        'color_name' => $color->color_name,
+                        'color_code' => $color->color_code,
+                        'stock' => min($size->stock, $color->stock),
+                    ]);
+                }
             }
         }
     }
