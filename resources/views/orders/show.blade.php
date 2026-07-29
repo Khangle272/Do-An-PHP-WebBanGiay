@@ -21,7 +21,8 @@
                             $statusColors = ['pending' => 'warning', 'processing' => 'primary', 'completed' => 'success', 'cancelled' => 'danger'];
                             $color = $statusColors[$order->status] ?? 'secondary';
                         @endphp
-                        <span id="order-status-badge" class="btn btn-{{ $color }} btn-sm" style="cursor: default;">{{ $order->status_label }}</span>
+                        <span id="order-status-badge" class="btn btn-{{ $color }} btn-sm"
+                            style="cursor: default;">{{ $order->status_label }}</span>
                     </div>
                     <p style="font-size: 14px; color: #666;">Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</p>
 
@@ -46,8 +47,7 @@
                                             </a>
                                         </td>
                                         <td style="font-size: 13px; color: #666;">
-                                            @if($item->size) Size {{ $item->size->size }} @endif
-                                            @if($item->color) / {{ $item->color->color_name }} @endif
+                                            {{ $item->variant?->label ?? '—' }}
                                         </td>
                                         <td>{{ number_format($item->product_price) }}₫</td>
                                         <td>{{ $item->quantity }}</td>
@@ -119,7 +119,7 @@
                             blue: 'primary',
                             green: 'success',
                             red: 'danger',
-                        } [e.status_color] ?? 'secondary') + ' btn-sm';
+                        }[e.status_color] ?? 'secondary') + ' btn-sm';
                     });
             });
         </script>

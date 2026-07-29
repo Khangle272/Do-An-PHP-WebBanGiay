@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CartItem extends Model
 {
-    protected $fillable = ['user_id', 'product_id', 'product_size_id', 'product_color_id', 'quantity'];
+    protected $fillable = ['user_id', 'product_id', 'product_size_id', 'product_color_id', 'product_variant_id', 'quantity'];
 
     public function user()
     {
@@ -26,6 +26,11 @@ class CartItem extends Model
     public function color()
     {
         return $this->belongsTo(ProductColor::class, 'product_color_id');
+    }
+
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 
     public function getSubtotalAttribute()

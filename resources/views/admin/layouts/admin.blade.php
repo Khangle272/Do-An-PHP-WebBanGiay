@@ -295,8 +295,11 @@
         .pagination {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 6px;
-            margin-top: 24px;
+            margin: 24px 0 0;
+            padding: 0;
+            list-style: none;
         }
 
         .pagination a,

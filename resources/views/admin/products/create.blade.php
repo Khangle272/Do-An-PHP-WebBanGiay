@@ -74,34 +74,24 @@
 
             <hr style="margin: 20px 0;">
 
-            <h4 style="margin-bottom: 16px;">📏 Kích cỡ (Size)</h4>
-            <div id="sizes-wrapper">
-                <div class="size-row" style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <input type="text" name="sizes[0][size]" class="form-control" placeholder="Size (VD: 39)"
-                        style="max-width: 150px;" required>
-                    <input type="number" name="sizes[0][stock]" class="form-control" placeholder="Số lượng"
-                        style="max-width: 150px;" min="0" required>
+            <h4 style="margin-bottom: 16px;">📏🎨 Biến thể (Size + Màu + Tồn kho)</h4>
+            <p style="font-size: 13px; color: #999; margin-bottom: 8px;">
+                Mỗi dòng là 1 tổ hợp size + màu cụ thể với số lượng tồn kho riêng của tổ hợp đó.
+                Có thể để trống Size hoặc Màu nếu sản phẩm không phân loại theo chiều đó.
+            </p>
+            <div id="variants-wrapper">
+                <div class="variant-row" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
+                    <input type="text" name="variants[0][size]" class="form-control" placeholder="Size (VD: 39)" style="max-width: 130px;">
+                    <input type="text" name="variants[0][color_name]" class="form-control" placeholder="Tên màu (VD: Đen)" style="max-width: 150px;">
+                    <input type="number" name="variants[0][stock]" class="form-control" placeholder="Số lượng" style="max-width: 120px;" min="0" required>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="this.parentElement.remove()">Xóa</button>
                 </div>
             </div>
-            <button type="button" class="btn btn-sm btn-secondary" onclick="addSize()">+ Thêm size</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="addVariant()">+ Thêm biến thể</button>
 
             <hr style="margin: 20px 0;">
 
-            <h4 style="margin-bottom: 16px;">🎨 Màu sắc</h4>
-            <div id="colors-wrapper">
-                <div class="color-row" style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <input type="text" name="colors[0][name]" class="form-control" placeholder="Tên màu (VD: Trắng)"
-                        style="max-width: 150px;" required>
-                    <input type="text" name="colors[0][code]" class="form-control" placeholder="Mã màu (VD: #FFFFFF)"
-                        style="max-width: 150px;">
-                    <input type="number" name="colors[0][stock]" class="form-control" placeholder="Số lượng"
-                        style="max-width: 150px;" min="0" required>
-                </div>
-            </div>
-            <button type="button" class="btn btn-sm btn-secondary" onclick="addColor()">+ Thêm màu</button>
-
-            <hr style="margin: 20px 0;">
-            gallery (upload nhiều file)</h4>
+            <h4 style="margin-bottom: 16px;">🖼️ Ảnh gallery (upload nhiều file)</h4>
             <div id="images-wrapper">
                 <div class="image-row" style="margin-bottom: 8px;">
                     <input type="file" name="images[]" class="form-control" accept="image/*" multiple style="padding: 8px;">
@@ -110,7 +100,6 @@
             <small style="color: #999;">Có thể chọn nhiều file cùng lúc (JPEG, PNG, JPG, GIF, WebP, tối đa 2MB mỗi
                 file).</small>
             @error('images.*') <small style="color: red;">{{ $message }}</small> @enderror
-            <button type="button" class="btn btn-sm btn-secondary" onclick="addImage()">+ Thêm ảnh</button>
 
             <div style="margin-top: 24px;">
                 <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
@@ -119,24 +108,18 @@
         </form>
     </div>
 
-    <script>;
-        function addSize() {
-            const html = `<div class="size-row" style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <input type="text" name="sizes[${sizeIndex}][size]" class="form-control" placeholder="Size" style="max-width: 150px;" required>
-                    <input type="number" name="sizes[${sizeIndex}][stock]" class="form-control" placeholder="Số lượng" style="max-width: 150px;" min="0" required>
+    <script>
+        let variantIndex = 1;
+
+        function addVariant() {
+            const html = `<div class="variant-row" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
+                    <input type="text" name="variants[${variantIndex}][size]" class="form-control" placeholder="Size (VD: 39)" style="max-width: 130px;">
+                    <input type="text" name="variants[${variantIndex}][color_name]" class="form-control" placeholder="Tên màu (VD: Đen)" style="max-width: 150px;">
+                    <input type="number" name="variants[${variantIndex}][stock]" class="form-control" placeholder="Số lượng" style="max-width: 120px;" min="0" required>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="this.parentElement.remove()">Xóa</button>
                 </div>`;
-            document.getElementById('sizes-wrapper').insertAdjacentHTML('beforeend', html);
-            sizeIndex++;
-        }
-        function addColor() {
-            const html = `<div class="color-row" style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <input type="text" name="colors[${colorIndex}][name]" class="form-control" placeholder="Tên màu" style="max-width: 150px;" required>
-                    <input type="text" name="colors[${colorIndex}][code]" class="form-control" placeholder="Mã màu" style="max-width: 150px;">
-                    <input type="number" name="colors[${colorIndex}][stock]" class="form-control" placeholder="Số lượng" style="max-width: 150px;" min="0" required>
-                </div>`;
-            document.getElementById('colors-wrapper').insertAdjacentHTML('beforeend', html);
-            colorent.getElementById('images-wrapper').insertAdjacentHTML('beforeend', html);
-            imageIndex++;
+            document.getElementById('variants-wrapper').insertAdjacentHTML('beforeend', html);
+            variantIndex++;
         }
     </script>
 @endsection
