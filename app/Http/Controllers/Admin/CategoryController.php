@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Services\CacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -33,6 +34,10 @@ class CategoryController extends Controller
 
         Category::create($data);
 
+        // [CACHE] Danh mục vừa đổi -> xoá cache để trang chủ/danh sách
+        // sản phẩm lấy lại dữ liệu mới ở lần truy cập kế tiếp.
+        CacheService::forgetCategories();
+
         return redirect('/admin/danh-muc')->with('success', 'Thêm danh mục thành công!');
     }
 
@@ -57,6 +62,8 @@ class CategoryController extends Controller
 
         $category->update($data);
 
+        CacheService::forgetCategories();
+
         return redirect('/admin/danh-muc')->with('success', 'Cập nhật danh mục thành công!');
     }
 
@@ -67,6 +74,9 @@ class CategoryController extends Controller
             return back()->with('error', 'Không thể xóa danh mục có sản phẩm!');
         }
         $category->delete();
+
+        CacheService::forgetCategories();
+
         return back()->with('success', 'Xóa danh mục thành công!');
     }
 }

@@ -7,6 +7,10 @@
         <h2>📦 Quản lý Đơn hàng</h2>
     </div>
 
+    {{-- [SOCKET] Vùng thông báo realtime - script bên dưới sẽ chèn thẻ
+    thông báo mới vào đây mỗi khi có đơn hàng mới, không cần F5 --}}
+    <div id="realtime-order-alert"></div>
+
     <div class="card">
         <form method="GET" style="display: flex; gap: 10px; margin-bottom: 16px;">
             <select name="status" class="form-control" style="max-width: 200px;" onchange="this.form.submit()">
@@ -56,4 +60,26 @@
         </div>
         <div class="pagination">{{ $orders->links() }}</div>
     </div>
+
+    {{-- [SOCKET] Lắng nghe kênh riêng "admin.orders" (xem routes/channels.php).
+    Chỉ hoạt động khi đã cài & bật Reverb (BROADCAST_CONNECTION=reverb),
+    còn không thì trang vẫn chạy bình thường, chỉ là không có realtime. --}}
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                if (!window.Echo) return; // Chưa cấu hình Reverb -> bỏ qua, không lỗi
+
+                window.Echo.private('admin.orders')
+                    .listen('.order.placed', (e) => {
+                        const box = document.getElementById('realtime-order-alert');
+                        const item = document.createElement('div');
+                        item.className = 'alert alert-success';
+                        item.style.cssText = 'margin-bottom: 12px; cursor: pointer;';
+                        item.innerHTML = `🔔 Đơn hàng mới <strong>#${e.order_code}</strong> từ ${e.full_name} - ${Number(e.total_price).toLocaleString('vi-VN')}₫ lúc ${e.created_at}`;
+                        item.addEventListener('click', () => location.reload());
+                        box.prepend(item);
+                    });
+            });
+        </script>
+    @endpush
 @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Services\CacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -32,6 +33,8 @@ class BrandController extends Controller
 
         Brand::create($data);
 
+        CacheService::forgetBrands();
+
         return redirect('/admin/thuong-hieu')->with('success', 'Thêm thương hiệu thành công!');
     }
 
@@ -55,6 +58,8 @@ class BrandController extends Controller
 
         $brand->update($data);
 
+        CacheService::forgetBrands();
+
         return redirect('/admin/thuong-hieu')->with('success', 'Cập nhật thương hiệu thành công!');
     }
 
@@ -65,6 +70,9 @@ class BrandController extends Controller
             return back()->with('error', 'Không thể xóa thương hiệu có sản phẩm!');
         }
         $brand->delete();
+
+        CacheService::forgetBrands();
+
         return back()->with('success', 'Xóa thương hiệu thành công!');
     }
 }

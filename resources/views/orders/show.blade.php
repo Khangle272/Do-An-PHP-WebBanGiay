@@ -21,7 +21,8 @@
                             $statusColors = ['pending' => 'warning', 'processing' => 'primary', 'completed' => 'success', 'cancelled' => 'danger'];
                             $color = $statusColors[$order->status] ?? 'secondary';
                         @endphp
-                        <span class="btn btn-{{ $color }} btn-sm" style="cursor: default;">{{ $order->status_label }}</span>
+                        <span id="order-status-badge" class="btn btn-{{ $color }} btn-sm"
+                            style="cursor: default;">{{ $order->status_label }}</span>
                     </div>
                     <p style="font-size: 14px; color: #666;">Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</p>
 
@@ -46,8 +47,7 @@
                                             </a>
                                         </td>
                                         <td style="font-size: 13px; color: #666;">
-                                            @if($item->size) Size {{ $item->size->size }} @endif
-                                            @if($item->color) / {{ $item->color->color_name }} @endif
+                                            {{ $item->variant?->label ?? '—' }}
                                         </td>
                                         <td>{{ number_format($item->product_price) }}₫</td>
                                         <td>{{ $item->quantity }}</td>
@@ -101,4 +101,27 @@
             </div>
         </div>
     </div>
+
+    {{-- [SOCKET] Lắng nghe kênh riêng "order.{id}" (xem routes/channels.php)
+    - chỉ chính khách hàng đặt đơn này mới được phép nghe. Khi admin đổi
+    trạng thái, badge bên trên tự cập nhật mà không cần reload trang. --}}
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                if (!window.Echo) return; // Chưa cấu hình Reverb -> bỏ qua, không lỗi
+
+                window.Echo.private('order.{{ $order->id }}')
+                    .listen('.status.updated', (e) => {
+                        const badge = document.getElementById('order-status-badge');
+                        badge.textContent = e.status_label;
+                        badge.className = 'btn btn-' + ({
+                            yellow: 'warning',
+                            blue: 'primary',
+                            green: 'success',
+                            red: 'danger',
+                        }[e.status_color] ?? 'secondary') + ' btn-sm';
+                    });
+            });
+        </script>
+    @endpush
 @endsection

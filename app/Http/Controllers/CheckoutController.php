@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewOrderPlaced;
+use App\Mail\OrderPlacedMail;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
     public function index()
     {
-        $cartItems = CartItem::with(['product', 'size', 'color'])
+        $cartItems = CartItem::with(['product', 'variant'])
             ->where('user_id', Auth::id())
             ->get();
 
@@ -47,7 +50,7 @@ class CheckoutController extends Controller
             'address.required' => 'Vui lòng nhập địa chỉ giao hàng',
         ]);
 
-        $cartItems = CartItem::with(['product', 'size', 'color'])
+        $cartItems = CartItem::with(['product', 'variant'])
             ->where('user_id', Auth::id())
             ->get();
 
@@ -82,20 +85,31 @@ class CheckoutController extends Controller
             ]);
 
             foreach ($cartItems as $item) {
+                // [KHO] Giữ chỗ tồn kho ngay lúc đặt hàng bằng update có điều kiện
+                // (WHERE stock >= quantity) trên đúng 1 biến thể (size+màu cụ thể).
+                // Đây là thao tác atomic ở tầng DB nên tránh được race condition
+                // khi nhiều người cùng đặt 1 biến thể sắp hết hàng, mà không cần
+                // lock thủ công.
+                if ($item->product_variant_id) {
+                    $affected = $item->variant()
+                        ->where('stock', '>=', $item->quantity)
+                        ->decrement('stock', $item->quantity);
+
+                    if (!$affected) {
+                        throw new \RuntimeException(
+                            "Sản phẩm \"{$item->product->name}\" ({$item->variant->label}) không đủ số lượng trong kho (chỉ còn {$item->variant->stock} cái)."
+                        );
+                    }
+                }
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item->product_id,
-                    'product_size_id' => $item->product_size_id,
-                    'product_color_id' => $item->product_color_id,
+                    'product_variant_id' => $item->product_variant_id,
                     'product_name' => $item->product->name,
                     'product_price' => $item->product->final_price,
                     'quantity' => $item->quantity,
                 ]);
-
-                // Giảm stock
-                if ($item->product_size_id) {
-                    $item->size->decrement('stock', $item->quantity);
-                }
             }
 
             // Xóa giỏ hàng
@@ -103,8 +117,21 @@ class CheckoutController extends Controller
 
             DB::commit();
 
+            // [QUEUE] OrderPlacedMail implements ShouldQueue -> lệnh send()
+            // này chỉ ghi 1 job vào bảng `jobs` rồi trả về ngay lập tức,
+            // việc gửi email thật sự do "php artisan queue:work" xử lý ở nền.
+            Mail::to($order->email)->send(new OrderPlacedMail($order));
+
+            // [SOCKET] Event implements ShouldBroadcast -> cũng được đẩy
+            // vào queue rồi mới bắn qua WebSocket, không làm chậm response.
+            broadcast(new NewOrderPlaced($order))->toOthers();
+
             return redirect('/dat-hang/thanh-cong/' . $order->id);
 
+        } catch (\RuntimeException $e) {
+            // Lỗi hết hàng / không đủ tồn kho -> hiện đúng thông báo cho khách
+            DB::rollBack();
+            return back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại!');

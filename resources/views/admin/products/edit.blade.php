@@ -85,28 +85,53 @@
 
             <hr style="margin: 20px 0;">
 
-            <h4 style="margin-bottom: 16px;">📏 Kích cỡ hiện tại</h4>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
-                @foreach($product->sizes as $size)
-                    <span style="background: #f0f0f0; padding: 6px 14px; border-radius: 6px; font-size: 13px;">
-                        Size {{ $size->size }} ({{ $size->stock }} cái)
-                    </span>
-                @endforeach
+            <h4 style="margin-bottom: 16px;">📏🎨 Biến thể (Size + Màu + Tồn kho)</h4>
+            <p style="font-size: 13px; color: #999; margin-bottom: 8px;">
+                Mỗi dòng là 1 tổ hợp size + màu cụ thể với số lượng tồn kho riêng của tổ hợp đó.
+                Có thể để trống Size hoặc Màu nếu sản phẩm không phân loại theo chiều đó.
+            </p>
+            <div id="variants-wrapper">
+                @forelse($product->variants as $i => $variant)
+                    <div class="variant-row" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
+                        <input type="text" name="variants[{{ $i }}][size]" class="form-control" placeholder="Size (VD: 39)"
+                            style="max-width: 130px;" value="{{ $variant->size }}">
+                        <input type="text" name="variants[{{ $i }}][color_name]" class="form-control" placeholder="Tên màu (VD: Đen)"
+                            style="max-width: 150px;" value="{{ $variant->color_name }}">
+                        <input type="number" name="variants[{{ $i }}][stock]" class="form-control" placeholder="Số lượng"
+                            style="max-width: 120px;" min="0" value="{{ $variant->stock }}" required>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="this.parentElement.remove()">Xóa</button>
+                    </div>
+                @empty
+                    <div class="variant-row" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
+                        <input type="text" name="variants[0][size]" class="form-control" placeholder="Size (VD: 39)" style="max-width: 130px;">
+                        <input type="text" name="variants[0][color_name]" class="form-control" placeholder="Tên màu (VD: Đen)" style="max-width: 150px;">
+                        <input type="number" name="variants[0][stock]" class="form-control" placeholder="Số lượng" style="max-width: 120px;" min="0" required>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="this.parentElement.remove()">Xóa</button>
+                    </div>
+                @endforelse
             </div>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="addVariant()">+ Thêm biến thể</button>
+            <p style="font-size: 13px; color: #999; margin-top: 6px;">Xóa hết dòng (để trống) và bấm "Cập nhật" sẽ xóa toàn bộ biến thể của sản phẩm.</p>
 
-            <h4 style="margin-bottom: 16px;">🎨 Màu sắc hiện tại</h4>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
-                @foreach($product->colors as $color)
-                    <span
-                        style="background: #f0f0f0; padding: 6px 14px; border-radius: 6px; font-size: 13px; display: flex; align-items: center; gap: 6px;">
-                        <span
-                            style="width: 14px; height: 14px; border-radius: 50%; background: {{ $color->color_code }}; border: 1px solid #ccc; display: inline-block;"></span>
-                        {{ $color->color_name }} ({{ $color->stock }} cái)
-                    </span>
-                @endforeach
-            </div>
+            <hr style="margin: 20px 0;">
 
-            <p style="font-size: 13px; color: #999;">Để thay đổi size/màu, vui lòng xóa và tạo lại sản phẩm.</p>
+            <h4 style="margin-bottom: 16px;">🖼️ Thêm ảnh gallery (upload nhiều file)</h4>
+            <input type="file" name="images[]" class="form-control" accept="image/*" multiple style="padding: 8px;">
+            <small style="color: #999;">Ảnh mới sẽ được thêm vào, không xóa ảnh cũ (tối đa 2MB mỗi file).</small>
+            @error('images.*') <small style="color: red;">{{ $message }}</small> @enderror
+
+            @if($product->images->count())
+                <h5 style="margin: 16px 0 8px;">Ảnh hiện tại (tick để xóa)</h5>
+                <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                    @foreach($product->images as $image)
+                        <label style="text-align: center; cursor: pointer;">
+                            <img src="{{ $image->image_url ?? asset('storage/' . $image->image) }}"
+                                style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #e0e0e0; display: block; margin-bottom: 4px;">
+                            <input type="checkbox" name="delete_images[]" value="{{ $image->id }}"> Xóa
+                        </label>
+                    @endforeach
+                </div>
+            @endif
 
             <div style="margin-top: 24px;">
                 <button type="submit" class="btn btn-primary">Cập nhật</button>
@@ -114,4 +139,19 @@
             </div>
         </form>
     </div>
+
+    <script>
+        let variantIndex = {{ $product->variants->count() ?: 1 }};
+
+        function addVariant() {
+            const html = `<div class="variant-row" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
+                    <input type="text" name="variants[${variantIndex}][size]" class="form-control" placeholder="Size (VD: 39)" style="max-width: 130px;">
+                    <input type="text" name="variants[${variantIndex}][color_name]" class="form-control" placeholder="Tên màu (VD: Đen)" style="max-width: 150px;">
+                    <input type="number" name="variants[${variantIndex}][stock]" class="form-control" placeholder="Số lượng" style="max-width: 120px;" min="0" required>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="this.parentElement.remove()">Xóa</button>
+                </div>`;
+            document.getElementById('variants-wrapper').insertAdjacentHTML('beforeend', html);
+            variantIndex++;
+        }
+    </script>
 @endsection

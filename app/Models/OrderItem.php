@@ -9,8 +9,9 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'product_id',
-        'product_size_id',
-        'product_color_id',
+        'product_variant_id',
+        'product_size_id',   // giữ lại cột cũ trong lúc chuyển tiếp, chưa xóa DB
+        'product_color_id',  // giữ lại cột cũ trong lúc chuyển tiếp, chưa xóa DB
         'product_name',
         'product_price',
         'quantity',
@@ -31,6 +32,12 @@ class OrderItem extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+    }
+
+    // Giữ tạm 2 quan hệ cũ (phòng khi còn đơn hàng cũ chưa có product_variant_id)
     public function size()
     {
         return $this->belongsTo(ProductSize::class, 'product_size_id');

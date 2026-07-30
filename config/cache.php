@@ -129,8 +129,27 @@ return [
     | storage. By default, no PHP classes will be unserialized from your
     | cache to prevent gadget chain attacks if your APP_KEY is leaked.
     |
+    | [CACHE] Đồ án dùng Cache::remember() để cache trực tiếp các Eloquent
+    | Collection/Model (sản phẩm, danh mục, thương hiệu...) - vì vậy cần
+    | khai báo rõ các class được phép unserialize thay vì để mặc định false
+    | (sẽ khiến object cache bị hỏng thành __PHP_Incomplete_Class).
+    | Chỉ liệt kê đúng những class thực sự được cache, KHÔNG dùng `true`
+    | (cho phép tất cả) để tránh lỗ hổng deserialization nếu APP_KEY lộ.
+    |
     */
 
-    'serializable_classes' => false,
+    'serializable_classes' => [
+        \Illuminate\Support\Collection::class,
+        \Illuminate\Database\Eloquent\Collection::class,
+        \Illuminate\Pagination\LengthAwarePaginator::class,
+        \App\Models\Category::class,
+        \App\Models\Brand::class,
+        \App\Models\Product::class,
+        \App\Models\ProductImage::class,
+        \App\Models\ProductSize::class,
+        \App\Models\ProductColor::class,
+        \App\Models\Review::class,
+        \App\Models\User::class,
+    ],
 
 ];

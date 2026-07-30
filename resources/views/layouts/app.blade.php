@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- [SOCKET] Cờ báo cho resources/js/app.js biết có nên khởi tạo Echo hay không --}}
+    <meta name="app-user-logged-in" content="{{ auth()->check() ? '1' : '0' }}">
     <title>@yield('title', config('app.name')) - Web Bán Giày</title>
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -610,8 +612,11 @@
         .pagination {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 6px;
-            margin-top: 40px;
+            margin: 24px 0 0;
+            padding: 0;
+            list-style: none;
         }
 
         .pagination a,

@@ -2,19 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
-use App\Models\Category;
 use App\Models\Product;
+use App\Services\CacheService;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $featuredProducts = Product::active()->featured()->with(['category', 'brand'])->latest()->take(8)->get();
-        $newProducts = Product::active()->with(['category', 'brand'])->latest()->take(8)->get();
-        $categories = Category::active()->get();
-        $brands = Brand::active()->get();
+        // [CACHE] Trang chủ là trang có lượt truy cập nhiều nhất nhưng dữ
+        // liệu (sản phẩm nổi bật/mới nhất) không cần realtime tuyệt đối
+        // -> cache 30 phút, tự xoá khi admin thêm/sửa/xoá sản phẩm.
+        $data = Cache::remember(CacheService::KEY_HOME, CacheService::TTL_MEDIUM, function () {
+            return [
+                'featuredProducts' => Product::active()->featured()->with(['category', 'brand'])->latest()->take(8)->get(),
+                'newProducts' => Product::active()->with(['category', 'brand'])->latest()->take(8)->get(),
+            ];
+        });
 
-        return view('home', compact('featuredProducts', 'newProducts', 'categories', 'brands'));
+        // Danh mục & thương hiệu dùng chung cache với trang danh sách sản phẩm
+        $categories = CacheService::categories();
+        $brands = CacheService::brands();
+
+        return view('home', [
+            'featuredProducts' => $data['featuredProducts'],
+            'newProducts' => $data['newProducts'],
+            'categories' => $categories,
+            'brands' => $brands,
+        ]);
     }
 }

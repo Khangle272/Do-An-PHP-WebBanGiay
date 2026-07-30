@@ -12,13 +12,16 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
+    // [SOCKET] Bật broadcasting + đăng ký routes/channels.php.
+    // Route "broadcasting/auth" tự được tạo để Laravel Echo xác thực
+    // quyền nghe private channel (yêu cầu user đã đăng nhập).
+    ->withBroadcasting(
+        __DIR__ . '/../routes/channels.php',
+        ['middleware' => ['web', 'auth']],
+    )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
-        ]);
-
-        $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
