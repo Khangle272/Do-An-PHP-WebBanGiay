@@ -28,14 +28,24 @@ class AuthController extends Controller
             'password.required' => 'Vui lòng nhập mật khẩu',
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-            return redirect()->intended('/');
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            return back()->withErrors([
+                'email' => 'Email hoặc mật khẩu không chính xác',
+            ])->onlyInput('email');
         }
 
-        return back()->withErrors([
-            'email' => 'Email hoặc mật khẩu không chính xác',
-        ])->onlyInput('email');
+        if ($user->isCurrentlyLoggedIn()) {
+            return back()->withErrors([
+                'email' => 'Tài khoản này đang được đăng nhập ở nơi khác, vui lòng đăng xuất trước khi đăng nhập lại',
+            ])->onlyInput('email');
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        return redirect()->intended('/');
     }
 
     public function showRegisterForm()
