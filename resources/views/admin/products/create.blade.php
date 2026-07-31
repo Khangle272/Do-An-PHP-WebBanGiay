@@ -9,7 +9,7 @@
     </div>
 
     <div class="card">
-        <form method="POST" action="/admin/san-pham" enctype="multipart/form-data">
+        <form method="POST" action="/admin/san-pham" enctype="multipart/form-data" id="product-form">
             @csrf
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -84,7 +84,7 @@
                     <input type="text" name="variants[0][size]" class="form-control" placeholder="Size (VD: 39)" style="max-width: 130px;">
                     <input type="text" name="variants[0][color_name]" class="form-control" placeholder="Tên màu (VD: Đen)" style="max-width: 150px;">
                     <input type="number" name="variants[0][stock]" class="form-control" placeholder="Số lượng" style="max-width: 120px;" min="0" required>
-                    <button type="button" class="btn btn-sm btn-secondary" onclick="this.parentElement.remove()">Xóa</button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="removeVariant(this)">Xóa</button>
                 </div>
             </div>
             <button type="button" class="btn btn-sm btn-secondary" onclick="addVariant()">+ Thêm biến thể</button>
@@ -99,27 +99,79 @@
             </div>
             <small style="color: #999;">Có thể chọn nhiều file cùng lúc (JPEG, PNG, JPG, GIF, WebP, tối đa 2MB mỗi
                 file).</small>
+            <small style="color: #e94560; display: block; margin-top: 6px;">Lưu ý: dữ liệu form được tự động lưu khi
+                trang bị load lại, nhưng ảnh cần chọn lại sau khi load lại trang.</small>
             @error('images.*') <small style="color: red;">{{ $message }}</small> @enderror
 
             <div style="margin-top: 24px;">
                 <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
                 <a href="/admin/san-pham" class="btn btn-secondary">Hủy</a>
+                <button type="button" class="btn btn-sm btn-secondary"
+                    onclick="clearDraft()">🗑️ Xóa dữ liệu nháp</button>
             </div>
         </form>
     </div>
 
+    <script src="{{ asset('js/admin-form-draft.js') }}"></script>
     <script>
         let variantIndex = 1;
 
-        function addVariant() {
-            const html = `<div class="variant-row" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
-                    <input type="text" name="variants[${variantIndex}][size]" class="form-control" placeholder="Size (VD: 39)" style="max-width: 130px;">
-                    <input type="text" name="variants[${variantIndex}][color_name]" class="form-control" placeholder="Tên màu (VD: Đen)" style="max-width: 150px;">
-                    <input type="number" name="variants[${variantIndex}][stock]" class="form-control" placeholder="Số lượng" style="max-width: 120px;" min="0" required>
-                    <button type="button" class="btn btn-sm btn-secondary" onclick="this.parentElement.remove()">Xóa</button>
+        function variantRowHtml(i) {
+            return `<div class="variant-row" style="display: flex; gap: 10px; margin-bottom: 8px; align-items: center;">
+                    <input type="text" name="variants[${i}][size]" class="form-control" placeholder="Size (VD: 39)" style="max-width: 130px;">
+                    <input type="text" name="variants[${i}][color_name]" class="form-control" placeholder="Tên màu (VD: Đen)" style="max-width: 150px;">
+                    <input type="number" name="variants[${i}][stock]" class="form-control" placeholder="Số lượng" style="max-width: 120px;" min="0" required>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="removeVariant(this)">Xóa</button>
                 </div>`;
-            document.getElementById('variants-wrapper').insertAdjacentHTML('beforeend', html);
+        }
+
+        function addVariant() {
+            document.getElementById('variants-wrapper').insertAdjacentHTML('beforeend', variantRowHtml(variantIndex));
             variantIndex++;
+        }
+
+        function removeVariant(btn) {
+            btn.parentElement.remove();
+            if (window.AdminFormDraft) {
+                AdminFormDraft.save(document.getElementById('product-form'), 'product');
+            }
+        }
+
+        function clearDraft() {
+            if (!confirm('Xóa toàn bộ dữ liệu đã nhập trong form này?')) return;
+            if (window.AdminFormDraft) {
+                AdminFormDraft.clear('product');
+            }
+            document.getElementById('product-form').reset();
+        }
+
+        const productForm = document.getElementById('product-form');
+        if (productForm && window.AdminFormDraft) {
+            AdminFormDraft.autoSave(productForm, 'product', function (form, key) {
+                var data = AdminFormDraft.get(key);
+                if (!data) return;
+
+                // Khôi phục các trường thường (text, select, checkbox)
+                AdminFormDraft.restore(form, key);
+
+                // Tạo lại các dòng biến thể đã thêm thêm (index >= 1)
+                var wrapper = document.getElementById('variants-wrapper');
+                var maxIdx = 0;
+                for (var name in data) {
+                    var m = name.match(/^variants\[(\d+)\]\[(?:size|color_name|stock)\]$/);
+                    if (m) maxIdx = Math.max(maxIdx, parseInt(m[1], 10));
+                }
+                for (var i = 1; i <= maxIdx; i++) {
+                    if (data['variants[' + i + '][size]'] !== undefined ||
+                        data['variants[' + i + '][color_name]'] !== undefined ||
+                        data['variants[' + i + '][stock]'] !== undefined) {
+                        wrapper.insertAdjacentHTML('beforeend', variantRowHtml(i));
+                    }
+                }
+                // Đổ giá trị cho các dòng vừa tạo lại
+                AdminFormDraft.restore(form, key);
+                variantIndex = maxIdx + 1;
+            });
         }
     </script>
 @endsection

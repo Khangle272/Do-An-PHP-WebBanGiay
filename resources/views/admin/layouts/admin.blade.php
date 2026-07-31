@@ -436,6 +436,10 @@
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
+            <script>
+                // Lưu thành công -> xoá dữ liệu nháp đã lưu trên trình duyệt
+                if (window.AdminFormDraft) { AdminFormDraft.clearAll(); }
+            </script>
         @endif
         @if(session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
