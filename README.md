@@ -1,58 +1,144 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+👟 HỆ THỐNG WEB BÁN GIÀY TRỰC TUYẾN (SneakerShop)
+Học Phần: Lập Trình Mã Nguồn Mở Với PHP
+Giảng Viên Hướng Dẫn: Nguyễn Thanh Truyền
+Sinh Viên Thực Hiện: 
+- 2001230372 - Lê Lưu Gia Khang
+- 2001230389 - Phạm Gia Khánh
+- 2001230566 - Phạm Ánh Ngọc
+- 2001230699 - Lê Đông Phước
+  
+Mã Nguồn: C:\laragon\www\Do-An-PHP-WebBanGiay
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Repository GitHub: https://github.com/Khangle272/Do-An-PHP-WebBanGiay.git
 
-## About Laravel
+📌 GIỚI THIỆU ĐỀ TÀI
+SneakerShop là hệ thống website bán giày trực tuyến xây dựng trên Laravel, mô phỏng đầy đủ nghiệp vụ một sàn thương mại điện tử quy mô nhỏ: quản lý sản phẩm theo biến thể (size + màu + tồn kho riêng từng biến thể), giỏ hàng, đặt hàng, quản trị đơn hàng, cùng các kỹ thuật tối ưu hệ thống nâng cao (Cache, Queue, WebSocket/Broadcasting).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+🌟 TÍNH NĂNG NỔI BẬT
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+🛍️ 1. Phân Hệ Khách Hàng
+- Trang chủ: sản phẩm nổi bật, sản phẩm mới nhất, danh mục, thương hiệu (có Cache).
+- Danh sách & chi tiết sản phẩm: lọc theo danh mục/thương hiệu/giá, tìm kiếm, sắp xếp, phân trang.
+- Biến thể sản phẩm (Product Variant): mỗi sản phẩm có nhiều biến thể size + màu, mỗi biến thể quản lý tồn kho riêng — khách chọn đúng size/màu còn hàng mới thêm được vào giỏ.
+- Giỏ hàng: thêm/sửa số lượng/xóa sản phẩm, kiểm tra tồn kho theo biến thể trước khi cho thêm vào giỏ.
+- Đặt hàng (Checkout): giữ chỗ tồn kho ngay lúc đặt hàng (atomic, chống oversell khi nhiều người mua cùng lúc), tính phí vận chuyển tự động, sinh mã đơn hàng.
+- Theo dõi đơn hàng: xem lịch sử & chi tiết đơn, trạng thái đơn hàng cập nhật realtime không cần tải lại trang (WebSocket).
+- Đánh giá sản phẩm (Review) & Sản phẩm yêu thích (Wishlist).
+- Quản lý tài khoản cá nhân, đổi mật khẩu.
+- Nhận email xác nhận đơn hàng & email thông báo đổi trạng thái đơn (gửi nền qua hàng đợi, không làm chậm thao tác của khách).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+🛡️ 2. Phân Hệ Quản Trị Viên (Admin)
+- Dashboard thống kê: tổng doanh thu, tổng đơn hàng, tổng sản phẩm, tổng người dùng, biểu đồ doanh thu 7 ngày gần nhất (Chart.js), thống kê đơn hàng theo trạng thái, danh sách đơn hàng gần đây.
+- Quản lý sản phẩm (CRUD): thông tin sản phẩm, ảnh, danh mục, thương hiệu, và quản lý biến thể (size/màu/tồn kho) ngay trong form thêm/sửa sản phẩm.
+- Quản lý danh mục & thương hiệu (CRUD).
+- Quản lý đơn hàng: xem chi tiết, cập nhật trạng thái đơn (pending → processing → completed / cancelled). Hệ thống tự động trừ/hoàn kho tương ứng khi đơn bị hủy hoặc được khôi phục, có thông báo realtime khi phát sinh đơn hàng mới.
+- Quản lý người dùng.
 
-## Learning Laravel
+⚙️ 3. Nâng Cao: Cache – Queue – Socket
+- Cache: cache danh mục, thương hiệu, danh sách sản phẩm (theo bộ lọc), chi tiết sản phẩm, trang chủ — tự động xóa cache khi admin cập nhật dữ liệu liên quan, giảm đáng kể số lượt truy vấn CSDL lặp lại.
+- Queue: gửi email xác nhận đơn hàng và email đổi trạng thái đơn chạy nền qua hàng đợi (`php artisan queue:work`), không chặn phản hồi của người dùng/admin.
+- Socket (Broadcasting - Laravel Reverb): admin nhận thông báo đơn hàng mới realtime; khách hàng thấy trạng thái đơn hàng của mình tự cập nhật ngay khi admin thay đổi, không cần F5.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+🎨 GIAO DIỆN
+- Giao diện khách hàng: theme màu chủ đạo đỏ hồng (#e94560), thiết kế hiện đại, responsive.
+- Giao diện quản trị: sidebar tối, dashboard trực quan với biểu đồ Chart.js, bảng dữ liệu rõ ràng có phân trang.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+🛠️ CÔNG NGHỆ SỬ DỤNG
+- Backend Framework: PHP 8.3+, Laravel 13.x
+- Database: SQLite (mặc định môi trường dev) / hỗ trợ MySQL
+- Frontend: Blade Template, CSS viết tay tùy biến, Chart.js (dashboard admin)
+- Realtime: Laravel Reverb + Laravel Echo (WebSocket)
+- Queue: Laravel Queue (driver database)
+- Cache: Laravel Cache (driver file/database)
+- Build tool: Vite
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+🚀 HƯỚNG DẪN CÀI ĐẶT & CHẠY DỰ ÁN
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+1️⃣ Clone Repository
+```
+git clone [Điền link repo GitHub của bạn]
+cd Do-An-PHP-WebBanGiay
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+2️⃣ Cài Đặt Thư Viện
+```
+composer install
+npm install
+```
 
-## Contributing
+3️⃣ Cấu Hình File Môi Trường (.env)
+```
+copy .env.example .env
+php artisan key:generate
+```
+Mặc định dự án dùng SQLite, không cần cấu hình thêm. Nếu muốn dùng MySQL, sửa trong `.env`:
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=webbangiay
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4️⃣ Khởi Tạo CSDL & Seed Dữ Liệu Mẫu
+```
+php artisan migrate --seed
+```
 
-## Code of Conduct
+5️⃣ Tạo Liên Kết Storage & Build Frontend
+```
+php artisan storage:link
+npm run build
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+6️⃣ Khởi Động Server & Các Tiến Trình Nền
+```
+php artisan serve
+php artisan queue:work
+```
+```
+composer require laravel/reverb
+php artisan reverb:install
+php artisan reverb:start
+```
 
-## Security Vulnerabilities
+Truy cập hệ thống tại: http://127.0.0.1:8000
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+🔑 TÀI KHOẢN ĐĂNG NHẬP MẪU (Sau khi Seed)
 
-## License
+| Vai trò | Email | Mật khẩu | Quyền hạn |
+|---|---|---|---|
+| Admin | admin@webanhang.com | 12345678 | Quản trị toàn bộ hệ thống |
+| Khách hàng | user@webanhang.com | 12345678 | Mua hàng, đặt hàng, đánh giá |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+📁 CẤU TRÚC THƯ MỤC DỰ ÁN
+```
+Do-An-PHP-WebBanGiay/
+├── app/
+│   ├── Events/                # Sự kiện realtime (NewOrderPlaced, OrderStatusUpdated)
+│   ├── Http/
+│   │   └── Controllers/
+│   │       ├── Admin/         # DashboardController, ProductController, CategoryController,
+│   │       │                  # BrandController, OrderController, UserController
+│   │       ├── HomeController, ProductController, CartController,
+│   │       ├── CheckoutController, OrderController, ReviewController,
+│   │       └── WishlistController, ProfileController, AuthController
+│   ├── Mail/                  # OrderPlacedMail, OrderStatusUpdatedMail (gửi qua Queue)
+│   ├── Models/                # Product, ProductVariant, Category, Brand, Order,
+│   │                          # OrderItem, CartItem, Review, Wishlist, User
+│   └── Services/               # CacheService
+├── database/
+│   ├── migrations/            # Cấu trúc các bảng CSDL
+│   └── seeders/                # Dữ liệu mẫu (Category, Brand, Product)
+├── resources/
+│   ├── views/                  # Giao diện Blade (khách hàng & admin)
+│   └── js/app.js                # Cấu hình Laravel Echo (Socket)
+├── routes/
+│   ├── web.php                  # Route khách hàng & admin
+│   └── channels.php             # Phân quyền kênh Broadcasting (Socket)
+└── config/
+    ├── cache.php                # Whitelist class được phép cache
+    └── broadcasting.php         # Cấu hình Reverb
+```
+
