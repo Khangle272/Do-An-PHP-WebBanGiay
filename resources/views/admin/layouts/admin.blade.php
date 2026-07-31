@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- [SOCKET] Cờ báo cho resources/js/app.js biết có nên khởi tạo Echo hay không --}}
     <meta name="app-user-logged-in" content="{{ auth()->check() ? '1' : '0' }}">
+    <meta name="app-user-is-admin" content="{{ auth()->user()?->is_admin ? '1' : '0' }}">
     <title>@yield('title', 'Dashboard') - Admin SneakerShop</title>
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
