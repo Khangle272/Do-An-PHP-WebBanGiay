@@ -9,7 +9,7 @@
     </div>
 
     <div class="card" style="max-width: 600px;">
-        <form method="POST" action="/admin/danh-muc">
+        <form method="POST" action="/admin/danh-muc" id="category-form">
             @csrf
             <div class="form-group">
                 <label>Tên danh mục *</label>
@@ -26,6 +26,16 @@
             </div>
             <button type="submit" class="btn btn-primary">Lưu</button>
             <a href="/admin/danh-muc" class="btn btn-secondary">Hủy</a>
+            <button type="button" class="btn btn-sm btn-secondary"
+                onclick="if(confirm('Xóa toàn bộ dữ liệu đã nhập trong form này?')){AdminFormDraft.clear('category');document.getElementById('category-form').reset();}">🗑️
+                Xóa dữ liệu nháp</button>
         </form>
     </div>
+
+    <script src="{{ asset('js/admin-form-draft.js') }}"></script>
+    <script>
+        if (window.AdminFormDraft) {
+            AdminFormDraft.autoSave(document.getElementById('category-form'), 'category');
+        }
+    </script>
 @endsection

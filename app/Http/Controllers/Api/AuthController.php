@@ -53,6 +53,12 @@ class AuthController extends Controller
             ]);
         }
 
+        if ($user->isCurrentlyLoggedIn()) {
+            throw ValidationException::withMessages([
+                'email' => ['Tài khoản này đang được đăng nhập ở nơi khác, vui lòng đăng xuất trước khi đăng nhập lại'],
+            ]);
+        }
+
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([

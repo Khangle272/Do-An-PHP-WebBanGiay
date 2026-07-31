@@ -28,6 +28,12 @@ Route::middleware('guest')->group(function () {
     Route::post('/dang-nhap', [AuthController::class, 'login']);
     Route::get('/dang-ky', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/dang-ky', [AuthController::class, 'register']);
+
+    // Quên mật khẩu
+    Route::get('/quen-mat-khau', [AuthController::class, 'showForgotForm'])->name('password.request');
+    Route::post('/quen-mat-khau', [AuthController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/dat-lai-mat-khau/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/dat-lai-mat-khau', [AuthController::class, 'reset'])->name('password.update');
 });
 
 Route::post('/dang-xuat', [AuthController::class, 'logout'])->name('logout')->middleware('auth');

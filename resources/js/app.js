@@ -15,6 +15,7 @@ import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
 const isLoggedIn = document.querySelector('meta[name="app-user-logged-in"]')?.content === '1';
+const isAdmin = document.querySelector('meta[name="app-user-is-admin"]')?.content === '1';
 
 if (isLoggedIn && import.meta.env.VITE_REVERB_APP_KEY) {
     window.Echo = new Echo({
@@ -26,10 +27,13 @@ if (isLoggedIn && import.meta.env.VITE_REVERB_APP_KEY) {
         forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
         enabledTransports: ['ws', 'wss'],
     });
-}
-if (window.Echo) {
-    window.Echo.private('admin.orders')
-        .listen('.order.placed', (e) => {
-            console.log('🔔 Có đơn hàng mới:', e);
-        });
+
+    // Chỉ admin mới được phép nghe kênh "admin.orders" - tránh request
+    // broadcasting/auth trả về 403 cho khách hàng thường.
+    if (isAdmin) {
+        window.Echo.private('admin.orders')
+            .listen('.order.placed', (e) => {
+                console.log('🔔 Có đơn hàng mới:', e);
+            });
+    }
 }

@@ -9,7 +9,7 @@
     </div>
 
     <div class="card" style="max-width: 600px;">
-        <form method="POST" action="/admin/thuong-hieu">
+        <form method="POST" action="/admin/thuong-hieu" id="brand-form">
             @csrf
             <div class="form-group">
                 <label>Tên thương hiệu *</label>
@@ -22,6 +22,16 @@
             </div>
             <button type="submit" class="btn btn-primary">Lưu</button>
             <a href="/admin/thuong-hieu" class="btn btn-secondary">Hủy</a>
+            <button type="button" class="btn btn-sm btn-secondary"
+                onclick="if(confirm('Xóa toàn bộ dữ liệu đã nhập trong form này?')){AdminFormDraft.clear('brand');document.getElementById('brand-form').reset();}">🗑️
+                Xóa dữ liệu nháp</button>
         </form>
     </div>
+
+    <script src="{{ asset('js/admin-form-draft.js') }}"></script>
+    <script>
+        if (window.AdminFormDraft) {
+            AdminFormDraft.autoSave(document.getElementById('brand-form'), 'brand');
+        }
+    </script>
 @endsection
