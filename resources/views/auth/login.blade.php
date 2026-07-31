@@ -30,6 +30,8 @@
                 <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
                     <input type="checkbox" name="remember" id="remember" style="width: 16px; height: 16px;">
                     <label for="remember" style="margin: 0; font-size: 14px;">Ghi nhớ đăng nhập</label>
+                    <a href="{{ route('password.request') }}"
+                        style="margin-left: auto; color: #e94560; text-decoration: none; font-size: 14px;">Quên mật khẩu?</a>
                 </div>
                 <button type="submit" class="btn btn-primary w-full"
                     style="justify-content: center; padding: 12px; font-size: 16px;">Đăng nhập</button>
