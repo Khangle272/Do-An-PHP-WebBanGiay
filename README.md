@@ -12,6 +12,8 @@ Mã Nguồn: C:\laragon\www\Do-An-PHP-WebBanGiay
 
 Repository GitHub: https://github.com/Khangle272/Do-An-PHP-WebBanGiay.git
 
+Website deploy: https://kash-personifiant-noncompulsorily.ngrok-free.dev
+
 📌 GIỚI THIỆU ĐỀ TÀI
 SneakerShop là hệ thống website bán giày trực tuyến xây dựng trên Laravel, mô phỏng đầy đủ nghiệp vụ một sàn thương mại điện tử quy mô nhỏ: quản lý sản phẩm theo biến thể (size + màu + tồn kho riêng từng biến thể), giỏ hàng, đặt hàng, quản trị đơn hàng, cùng các kỹ thuật tối ưu hệ thống nâng cao (Cache, Queue, WebSocket/Broadcasting).
 
