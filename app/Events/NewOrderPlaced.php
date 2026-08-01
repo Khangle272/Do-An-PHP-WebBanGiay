@@ -45,7 +45,7 @@ class NewOrderPlaced implements ShouldBroadcast
             'order_code' => $this->order->order_code,
             'full_name' => $this->order->full_name,
             'total_price' => $this->order->total_price,
-            'created_at' => $this->order->created_at->format('H:i d/m/Y'),
+            'created_at' => $this->order->created_at->setTimezone('Asia/Ho_Chi_Minh')->format('H:i d/m/Y'),
         ];
     }
 }

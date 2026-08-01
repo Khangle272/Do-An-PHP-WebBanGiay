@@ -71,6 +71,43 @@
                 </form>
             </div>
 
+            <script>
+                (function () {
+                    const form = document.getElementById('checkout-form');
+                    if (!form) return;
+
+                    const STORAGE_KEY = 'checkout_form_data';
+                    const fields = ['full_name', 'email', 'phone', 'address', 'note'];
+
+                    function save() {
+                        const data = {};
+                        fields.forEach(name => {
+                            const el = form.elements[name];
+                            if (el) data[name] = el.value;
+                        });
+                        try {
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                        } catch (e) {}
+                    }
+
+                    try {
+                        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                        fields.forEach(name => {
+                            const el = form.elements[name];
+                            if (el && saved[name] !== undefined) {
+                                el.value = saved[name];
+                            }
+                        });
+                    } catch (e) {}
+
+                    form.addEventListener('input', save);
+
+                    form.addEventListener('submit', function () {
+                        localStorage.removeItem(STORAGE_KEY);
+                    });
+                })();
+            </script>
+
             <!-- Tóm tắt đơn hàng -->
             <div
                 style="background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); height: fit-content; position: sticky; top: 100px;">

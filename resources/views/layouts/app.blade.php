@@ -1091,9 +1091,7 @@
             <ul class="nav-menu">
                 <li><a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Trang chủ</a></li>
                 <li><a href="/san-pham" class="{{ request()->is('san-pham*') ? 'active' : '' }}">Sản phẩm</a></li>
-                @foreach(\App\Models\Category::active()->take(4)->get() as $cat)
-                    <li><a href="/danh-muc/{{ $cat->slug }}">{{ $cat->name }}</a></li>
-                @endforeach
+
             </ul>
 
             <div class="header-actions">
